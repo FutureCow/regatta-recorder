@@ -72,10 +72,14 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
     String? boatName,
     String? teamName,
   }) async {
-    final s = (state.valueOrNull ?? AppSettings.defaults()).copyWith(
-      boatType: boatType,
-      boatName: boatName,
-      teamName: teamName,
+    // Copy current settings, only overwrite fields that were provided.
+    // copyWith uses _unset sentinel — passing null overwrites with null,
+    // so we fall back to the current value for unprovided fields.
+    final current = state.valueOrNull ?? AppSettings.defaults();
+    final s = current.copyWith(
+      boatType: boatType ?? current.boatType,
+      boatName: boatName ?? current.boatName,
+      teamName: teamName ?? current.teamName,
     );
     await save(s);
 
