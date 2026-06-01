@@ -1,6 +1,7 @@
 // lib/services/gps_service.dart
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 
 class GpsPoint {
   final double latitude;
@@ -51,9 +52,10 @@ class GpsService {
 
     try {
       _stream = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
+        locationSettings: AndroidSettings(
           accuracy: LocationAccuracy.bestForNavigation,
           distanceFilter: 0,
+          intervalDuration: const Duration(seconds: 1),
         ),
       ).map((p) => GpsPoint(
             latitude: p.latitude,
