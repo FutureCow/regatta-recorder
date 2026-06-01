@@ -18,6 +18,7 @@ class RecorderNotifier extends Notifier<RecorderState> {
   final TrackRecorder _trackRecorder = TrackRecorder();
   Timer? _elapsedTimer;
   DateTime? _startTime;
+  bool _starting = false; // prevent re-entrancy during async GPS check
 
   @override
   RecorderState build() => const RecorderState();
@@ -29,6 +30,11 @@ class RecorderNotifier extends Notifier<RecorderState> {
 
   /// Start recording. Keeps screen on + starts foreground service.
   Future<void> startRecording() async {
+    // Prevent re-entrancy: home_screen listener fires on every timer tick
+    // and startRecording() takes up to 5s (GPS check). Without this guard,
+    // multiple calls stack up, cancel subscriptions, and points stay at 0.
+    if (_starting || state.status == RecorderStatus.recording) return;
+    _starting = true;
     try {
       // 1. Permission
       final ok = await requestPermission();
@@ -79,6 +85,8 @@ class RecorderNotifier extends Notifier<RecorderState> {
       state = state.copyWith(
         error: 'Fout bij starten: ${e.toString()}',
       );
+    } finally {
+      _starting = false;
     }
   }
 
