@@ -136,10 +136,10 @@ class _TracksScreenState extends ConsumerState<TracksScreen> {
       appBar: AppBar(title: const Text('Opgenomen tracks')),
       body: tracksAsync.when(
         data: (tracks) => tracks.isEmpty
-            ? Center(
+            ? const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: const [
                     const Icon(Icons.gps_off, size: 48, color: AppColors.grey),
                     const SizedBox(height: 12),
                     const Text('Nog geen tracks opgenomen',
